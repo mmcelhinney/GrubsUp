@@ -11,11 +11,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white/95 backdrop-blur-md shadow-md border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-primary-600">🍽️ DinnersReady</span>
+            <span className="text-2xl font-bold text-orange-600">🍽️ DinnersReady</span>
           </Link>
 
           <div className="flex items-center space-x-4">
@@ -23,14 +23,14 @@ export default function Navbar() {
               <>
                 <Link
                   to="/dashboard"
-                  className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Dashboard
                 </Link>
                 {user?.role === 'admin' && (
                   <Link
                     to="/admin"
-                    className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium"
                   >
                     Admin
                   </Link>
@@ -49,7 +49,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Login
                 </Link>

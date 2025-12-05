@@ -7,66 +7,69 @@ export default function Landing() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-500 to-primary-700 text-white py-20">
+      <section className="relative text-white py-20">
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-5xl font-bold mb-6">
+              <h1 className="text-5xl font-bold mb-6 drop-shadow-lg">
                 Turn Your Fridge Into
-                <span className="block text-primary-100">Delicious Recipes</span>
+                <span className="block text-orange-300">Delicious Recipes</span>
               </h1>
-              <p className="text-xl mb-8 text-primary-100">
+              <p className="text-xl mb-8 text-gray-100 drop-shadow-md">
                 Simply snap a photo of your fridge, and our AI will suggest amazing recipes
                 based on what you have. No more wondering what to cook!
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 {isAuthenticated ? (
-                  <Link to="/dashboard" className="btn bg-white text-primary-600 hover:bg-gray-100">
+                  <Link to="/dashboard" className="btn bg-orange-500 text-white hover:bg-orange-600 shadow-lg">
                     Go to Dashboard
                   </Link>
                 ) : (
                   <>
-                    <Link to="/register" className="btn bg-white text-primary-600 hover:bg-gray-100">
+                    <Link to="/register" className="btn bg-orange-500 text-white hover:bg-orange-600 shadow-lg">
                       Get Started Free
                     </Link>
-                    <Link to="/login" className="btn bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600">
+                    <Link to="/login" className="btn bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-orange-600">
                       Login
                     </Link>
                   </>
                 )}
-                <Link to="/dashboard" className="btn bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary-600">
+                <Link to="/dashboard" className="btn bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-orange-600">
                   Try as Guest
                 </Link>
               </div>
             </div>
             <div className="hidden md:block">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform">
                 <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                  <div className="bg-white rounded p-2 text-center text-gray-500 text-sm">
+                  <div className="bg-white rounded p-2 text-center text-gray-600 text-sm font-medium">
                     📸 Fridge Scan
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="bg-primary-50 rounded p-3 flex items-center justify-between">
-                    <span className="text-gray-700">🥛 Milk</span>
-                    <span className="text-xs text-gray-500">88%</span>
+                  <div className="bg-orange-50 rounded p-3 flex items-center justify-between border border-orange-200">
+                    <span className="text-gray-800 font-medium">🥛 Milk</span>
+                    <span className="text-xs text-orange-600 font-semibold">88%</span>
                   </div>
-                  <div className="bg-primary-50 rounded p-3 flex items-center justify-between">
-                    <span className="text-gray-700">🥚 Eggs</span>
-                    <span className="text-xs text-gray-500">92%</span>
+                  <div className="bg-orange-50 rounded p-3 flex items-center justify-between border border-orange-200">
+                    <span className="text-gray-800 font-medium">🥚 Eggs</span>
+                    <span className="text-xs text-orange-600 font-semibold">92%</span>
                   </div>
-                  <div className="bg-primary-50 rounded p-3 flex items-center justify-between">
-                    <span className="text-gray-700">🧈 Butter</span>
-                    <span className="text-xs text-gray-500">75%</span>
+                  <div className="bg-orange-50 rounded p-3 flex items-center justify-between border border-orange-200">
+                    <span className="text-gray-800 font-medium">🧈 Butter</span>
+                    <span className="text-xs text-orange-600 font-semibold">75%</span>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 font-semibold mb-2">Suggested Recipes:</p>
+                <div className="mt-4 pt-4 border-t border-gray-300">
+                  <p className="text-sm text-gray-700 font-semibold mb-2">Suggested Recipes:</p>
                   <div className="space-y-2">
-                    <div className="bg-white border border-gray-200 rounded p-2 text-sm">
+                    <div className="bg-white border border-orange-200 rounded p-2 text-sm text-gray-700">
                       🍳 Scrambled Eggs
                     </div>
-                    <div className="bg-white border border-gray-200 rounded p-2 text-sm">
+                    <div className="bg-white border border-orange-200 rounded p-2 text-sm text-gray-700">
                       🥞 Pancakes
                     </div>
                   </div>
@@ -75,10 +78,11 @@ export default function Landing() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -108,7 +112,7 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white/90 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Cooking?</h2>
           <p className="text-xl text-gray-600 mb-8">

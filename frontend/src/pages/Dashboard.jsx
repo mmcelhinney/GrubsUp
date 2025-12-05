@@ -68,7 +68,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {isAuthenticated ? 'Welcome Back!' : 'Guest Mode'}
@@ -86,7 +86,7 @@ export default function Dashboard() {
           />
           {scanning && (
             <div className="mt-4 card text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-2"></div>
               <p className="text-gray-600">Scanning image for ingredients...</p>
             </div>
           )}

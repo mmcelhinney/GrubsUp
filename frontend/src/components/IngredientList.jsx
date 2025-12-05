@@ -14,7 +14,7 @@ export default function IngredientList({ ingredients }) {
         {ingredients.map((ingredient, index) => (
           <div
             key={index}
-            className="bg-primary-50 border border-primary-200 rounded-lg p-3"
+            className="bg-orange-50 border border-orange-200 rounded-lg p-3"
           >
             <div className="flex justify-between items-center">
               <span className="font-medium text-gray-800 capitalize">
