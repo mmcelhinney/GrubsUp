@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  user
+  guest
+}
+
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          Role      @default(user)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  images        Image[]
+  savedRecipes  UserSavedRecipe[]
+
+  @@map("users")
+}
+
+model Image {
+  id            String    @id @default(uuid())
+  userId        String?   @map("user_id")
+  filePath      String    @map("file_path")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredients   ImageIngredient[]
+
+  @@map("images")
+}
+
+model Ingredient {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  imageIngredients ImageIngredient[]
+  recipeIngredients RecipeIngredient[]
+
+  @@map("ingredients")
+}
+
+model ImageIngredient {
+  id            String    @id @default(uuid())
+  imageId       String    @map("image_id")
+  ingredientId  String    @map("ingredient_id")
+  confidence    Float
+  
+  image         Image     @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  ingredient    Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([imageId, ingredientId])
+  @@map("image_ingredients")
+}
+
+model Recipe {
+  id            String    @id @default(uuid())
+  name          String
+  instructions  String    @db.Text
+  imageUrl      String?   @map("image_url")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  ingredients   RecipeIngredient[]
+  savedBy       UserSavedRecipe[]
+
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  recipeId      String    @map("recipe_id")
+  ingredientId  String    @map("ingredient_id")
+  
+  recipe        Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient    Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, ingredientId])
+  @@map("recipe_ingredients")
+}
+
+model UserSavedRecipe {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  recipeId      String    @map("recipe_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe        Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@map("user_saved_recipes")
+}
+
