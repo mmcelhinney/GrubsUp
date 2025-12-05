@@ -122,11 +122,18 @@ const useAuthStore = create(
         try {
           const response = await api.get('/auth/me');
           set({ user: response.data.user });
+          saveToStorage({ ...get(), user: response.data.user });
           return true;
         } catch (error) {
           get().clearAuth();
           return false;
         }
+      },
+
+      setUser: (user) => {
+        const newState = { ...get(), user };
+        set(newState);
+        saveToStorage(newState);
       }
     };
   }

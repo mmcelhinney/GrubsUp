@@ -85,7 +85,7 @@ export default function ImageUploader({ onImageSelect, onImageUpload }) {
 
   return (
     <div className="card">
-      <h3 className="text-xl font-semibold mb-4">Upload Fridge Image</h3>
+      <h3 className="text-xl font-semibold mb-4"> Upload a photo of your fridge to discover recipes you can make</h3>
       
       <div className="space-y-4">
         {/* Camera input - opens camera on mobile */}

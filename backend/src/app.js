@@ -10,6 +10,7 @@ import uploadRoutes from './routes/upload.js';
 import aiRoutes from './routes/ai.js';
 import recipeRoutes from './routes/recipes.js';
 import adminRoutes from './routes/admin.js';
+import profileRoutes from './routes/profile.js';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Health check
 app.get('/api/health', async (req, res) => {

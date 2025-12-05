@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import IngredientList from '../components/IngredientList';
 import useRecipeStore from '../store/recipeStore';
@@ -19,7 +19,7 @@ export default function Dashboard() {
     setError 
   } = useRecipeStore();
   
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
   const handleImageSelect = (file) => {
@@ -68,14 +68,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ position: 'relative', zIndex: 1 }}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {isAuthenticated ? 'Welcome Back!' : 'Guest Mode'}
-        </h1>
-        <p className="text-gray-600">
-          Upload a photo of your fridge to discover recipes you can make
-        </p>
+
+
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">

@@ -110,10 +110,16 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Only clear auth on 401 if it's not a profile endpoint
+    // Profile endpoint might fail due to network issues, not auth
     if (error.response?.status === 401) {
-      // Clear auth on 401
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
+      const url = error.config?.url || '';
+      // Don't auto-logout on profile endpoints - let the component handle it
+      if (!url.includes('/profile') && !url.includes('/auth/me')) {
+        // Clear auth on 401 for other endpoints
+        localStorage.removeItem('auth-storage');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

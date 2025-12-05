@@ -6,7 +6,7 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">🍽️ DinnersReady</h3>
             <p className="text-gray-400">
-              AI-powered recipe suggestions based on what's in your fridge.
+            “No more ‘What’s for dinner?’—just snap and cook.”.
             </p>
           </div>
           <div>
@@ -14,17 +14,16 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li><a href="/" className="hover:text-white">Home</a></li>
               <li><a href="/dashboard" className="hover:text-white">Dashboard</a></li>
+              <li><a href="/contact" className="hover:text-white">Contact</a></li>
+              <li><a href="/about" className="hover:text-white">About Us</a></li>
+             
+              
             </ul>
           </div>
-          <div>
-            <h4 className="text-md font-semibold mb-4">About</h4>
-            <p className="text-gray-400">
-              Built with React, Express, and MySQL. Powered by AI.
-            </p>
-          </div>
+
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 DinnersReady. All rights reserved.</p>
+          <p>&copy; 2025 DinnersReady AI. All rights reserved.</p>
         </div>
       </div>
     </footer>
