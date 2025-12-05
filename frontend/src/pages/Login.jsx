@@ -22,15 +22,25 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const result = await login(username, password);
+    try {
+      const result = await login(username, password);
 
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.error);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        // Better error messages
+        if (result.error?.includes('Network') || result.error?.includes('ERR_NETWORK')) {
+          setError('Cannot connect to server. Make sure the backend is running on port 5000.');
+        } else {
+          setError(result.error || 'Login failed. Please check your credentials.');
+        }
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

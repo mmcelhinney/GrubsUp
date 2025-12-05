@@ -2,15 +2,35 @@ import bcrypt from 'bcrypt';
 import { body, validationResult } from 'express-validator';
 import prisma from '../utils/db.js';
 import { generateTokens } from '../utils/jwt.js';
+import { logActivity } from '../middleware/logger.js';
+
+// Helper to get client IP
+const getClientIP = (req) => {
+  return req.ip || 
+         req.connection.remoteAddress || 
+         req.socket.remoteAddress ||
+         (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+         'unknown';
+};
 
 export const register = async (req, res, next) => {
+  const clientIP = getClientIP(req);
+  
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      await logActivity('REGISTER_VALIDATION_ERROR', {
+        errors: errors.array()
+      }, null, clientIP);
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { username, email, password } = req.body;
+    
+    await logActivity('REGISTER_ATTEMPT', {
+      username,
+      email
+    }, null, clientIP);
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
@@ -49,6 +69,11 @@ export const register = async (req, res, next) => {
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(user.id);
 
+    await logActivity('REGISTER_SUCCESS', {
+      username: user.username,
+      email: user.email
+    }, user.id, clientIP);
+
     res.status(201).json({
       message: 'User registered successfully',
       user,
@@ -56,67 +81,94 @@ export const register = async (req, res, next) => {
       refreshToken
     });
   } catch (error) {
+    await logActivity('REGISTER_ERROR', {
+      error: error.message,
+      username: req.body.username
+    }, null, clientIP);
     next(error);
   }
 };
 
 export const login = async (req, res, next) => {
+  const clientIP = getClientIP(req);
+  const { username, password } = req.body || {};
+  
   try {
-    console.log('🔐 Login attempt:', {
-      username: req.body.username,
-      hasPassword: !!req.body.password,
-      passwordLength: req.body.password?.length
-    });
+    // Log login attempt
+    await logActivity('LOGIN_ATTEMPT', {
+      username: username || 'missing',
+      hasPassword: !!password,
+      userAgent: req.get('user-agent')
+    }, null, clientIP);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('❌ Validation errors:', errors.array());
+      await logActivity('LOGIN_VALIDATION_ERROR', {
+        errors: errors.array(),
+        username: username || 'missing'
+      }, null, clientIP);
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password } = req.body;
-
-    console.log('🔍 Searching for user:', username);
+    if (!username || !password) {
+      await logActivity('LOGIN_MISSING_CREDENTIALS', {
+        hasUsername: !!username,
+        hasPassword: !!password
+      }, null, clientIP);
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
 
     // Find user
-    const user = await prisma.user.findUnique({
-      where: { username }
-    });
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { username }
+      });
+    } catch (dbError) {
+      console.error('❌ DATABASE ERROR during user lookup:', dbError);
+      await logActivity('LOGIN_DB_ERROR', {
+        error: dbError.message,
+        username
+      }, null, clientIP);
+      return res.status(500).json({ error: 'Database connection error' });
+    }
 
     if (!user) {
-      console.log('❌ User not found:', username);
-      // Also check if any users exist at all
-      const userCount = await prisma.user.count();
-      console.log('ℹ️  Total users in database:', userCount);
+      await logActivity('LOGIN_FAILED', {
+        reason: 'USER_NOT_FOUND',
+        username
+      }, null, clientIP);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-
-    console.log('✅ User found:', {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      hasPasswordHash: !!user.passwordHash,
-      passwordHashLength: user.passwordHash?.length
-    });
 
     // Verify password
-    console.log('🔑 Verifying password...');
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-    console.log('🔑 Password comparison result:', isValidPassword);
-
-    if (!isValidPassword) {
-      console.log('❌ Password mismatch for user:', username);
-      // For debugging: try to see what the stored hash looks like (first 20 chars only)
-      console.log('ℹ️  Stored hash preview:', user.passwordHash?.substring(0, 20) + '...');
-      return res.status(401).json({ error: 'Invalid credentials' });
+    let isValidPassword = false;
+    try {
+      isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    } catch (bcryptError) {
+      console.error('❌ BCRYPT ERROR:', bcryptError);
+      await logActivity('LOGIN_BCRYPT_ERROR', {
+        error: bcryptError.message,
+        username
+      }, user.id, clientIP);
+      return res.status(500).json({ error: 'Password verification error' });
     }
 
-    console.log('✅ Password verified successfully');
+    if (!isValidPassword) {
+      await logActivity('LOGIN_FAILED', {
+        reason: 'INVALID_PASSWORD',
+        username
+      }, user.id, clientIP);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(user.id);
-    console.log('✅ Tokens generated for user:', username);
+    
+    await logActivity('LOGIN_SUCCESS', {
+      username: user.username,
+      role: user.role
+    }, user.id, clientIP);
 
     res.json({
       message: 'Login successful',
@@ -130,8 +182,13 @@ export const login = async (req, res, next) => {
       refreshToken
     });
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('❌ LOGIN ERROR:', error);
     console.error('❌ Error stack:', error.stack);
+    await logActivity('LOGIN_ERROR', {
+      error: error.message,
+      stack: error.stack?.substring(0, 500),
+      username: username || 'unknown'
+    }, null, clientIP);
     next(error);
   }
 };

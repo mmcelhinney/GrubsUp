@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import api from '../utils/api.js';
 
 // Simple persistence helper
 const loadFromStorage = () => {
@@ -32,10 +30,7 @@ const useAuthStore = create(
       isAuthenticated: false
     };
 
-    // Set axios header if token exists
-    if (initialState.accessToken) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${initialState.accessToken}`;
-    }
+    // Note: Auth headers are handled by api interceptor
 
     return {
       ...initialState,
@@ -49,10 +44,7 @@ const useAuthStore = create(
         };
         set(newState);
         saveToStorage(newState);
-        // Set default authorization header
-        if (accessToken) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        }
+        // Auth headers are handled by api interceptor
       },
 
       clearAuth: () => {
@@ -64,12 +56,13 @@ const useAuthStore = create(
         };
         set(newState);
         saveToStorage(newState);
-        delete axios.defaults.headers.common['Authorization'];
+        // Auth headers are handled by api interceptor
       },
 
       login: async (username, password) => {
         try {
-          const response = await axios.post(`${API_URL}/auth/login`, {
+          console.log('🔐 Attempting login...');
+          const response = await api.post('/auth/login', {
             username,
             password
           });
@@ -79,16 +72,18 @@ const useAuthStore = create(
 
           return { success: true, user };
         } catch (error) {
+          console.error('❌ Login error:', error);
+          console.error('❌ Error response:', error.response);
           return {
             success: false,
-            error: error.response?.data?.error || 'Login failed'
+            error: error.response?.data?.error || error.message || 'Login failed'
           };
         }
       },
 
       register: async (username, email, password) => {
         try {
-          const response = await axios.post(`${API_URL}/auth/register`, {
+          const response = await api.post('/auth/register', {
             username,
             email,
             password
@@ -99,16 +94,17 @@ const useAuthStore = create(
 
           return { success: true, user };
         } catch (error) {
+          console.error('❌ Registration error:', error);
           return {
             success: false,
-            error: error.response?.data?.error || 'Registration failed'
+            error: error.response?.data?.error || error.message || 'Registration failed'
           };
         }
       },
 
       logout: async () => {
         try {
-          await axios.post(`${API_URL}/auth/logout`);
+          await api.post('/auth/logout');
         } catch (error) {
           // Ignore errors on logout
         } finally {
@@ -124,7 +120,7 @@ const useAuthStore = create(
         }
 
         try {
-          const response = await axios.get(`${API_URL}/auth/me`);
+          const response = await api.get('/auth/me');
           set({ user: response.data.user });
           return true;
         } catch (error) {
@@ -136,11 +132,7 @@ const useAuthStore = create(
   }
 );
 
-// Initialize axios defaults on store creation
-const { accessToken } = useAuthStore.getState();
-if (accessToken) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-}
+// Note: Authorization headers are now handled by the api interceptor
 
 export default useAuthStore;
 

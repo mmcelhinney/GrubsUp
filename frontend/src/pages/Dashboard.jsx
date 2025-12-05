@@ -5,6 +5,7 @@ import IngredientList from '../components/IngredientList';
 import useRecipeStore from '../store/recipeStore';
 import api from '../utils/api';
 import useAuthStore from '../store/authStore';
+import { getImageUrl } from '../utils/getApiUrl';
 
 export default function Dashboard() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -100,7 +101,7 @@ export default function Dashboard() {
         <div className="mt-8 card">
           <h3 className="text-lg font-semibold mb-2">Uploaded Image</h3>
           <img
-            src={`http://localhost:5000${uploadedImagePath}`}
+            src={getImageUrl(uploadedImagePath)}
             alt="Uploaded fridge"
             className="max-w-full h-auto rounded-lg"
           />
